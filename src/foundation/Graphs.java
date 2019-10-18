@@ -6,6 +6,10 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.Stack;
+
+
+
 
 public class Graphs {
 
@@ -540,6 +544,291 @@ public class Graphs {
 //	addEdge(graph, 2, 0, 10);
 //	System.out.println(isBipartite(graph));
 
+	static class Dipair implements Comparable<Dipair> {
+		String psf;
+		int v;
+		int wsf;
+
+		public Dipair(int v, String psf, int wsf) {
+			this.v = v;
+			this.psf = psf;
+			this.wsf = wsf;
+		}
+
+		public int compareTo(Dipair o) {
+			return this.wsf - o.wsf;
+		}
+
+		public String toString() {
+			return v + " via " + psf + " @ " + wsf;
+		}
+	}
+
+	static void Dijkstra(ArrayList<ArrayList<Edge>> graph, int src) {
+		PriorityQueue<Dipair> pq = new PriorityQueue<>();
+		pq.add(new Dipair(src, src + "", 0));
+		boolean[] visited = new boolean[graph.size()];
+		while (pq.size() > 0) {
+			Dipair rem = pq.remove();
+			if (visited[rem.v]) {
+				continue;
+			}
+			visited[rem.v] = true;
+			System.out.println(rem);
+			for (int n = 0; n < graph.get(rem.v).size(); n++) {
+				Edge ne = graph.get(rem.v).get(n);
+				if (visited[ne.nbr] == false) {
+					pq.add(new Dipair(ne.nbr, rem.psf + " " + ne.nbr, rem.wsf + ne.wt));
+				}
+			}
+		}
+	}
+
+	static class Ppair implements Comparable<Ppair> {
+		int v;
+		int av;
+		int cost;
+
+		public Ppair(int v, int av, int cost) {
+			this.v = v;
+			this.av = av;
+			this.cost = cost;
+		}
+
+		@Override
+		public int compareTo(Ppair o) {
+			return this.cost - o.cost;
+		}
+
+		public String toString() {
+			return v + " via " + av + " @ " + cost;
+		}
+	}
+
+	public static void Prims(ArrayList<ArrayList<Edge>> graph, int src) {
+		boolean[] visited = new boolean[graph.size()];
+		PriorityQueue<Ppair> pq = new PriorityQueue<>();
+		pq.add(new Ppair(src, src, 0));
+
+		while (pq.size() > 0) {
+			Ppair rem = pq.remove();
+
+			if (visited[rem.v]) {
+				continue;
+			}
+			visited[rem.v] = true;
+			System.out.println(rem);
+			for (int n = 0; n < graph.get(rem.v).size(); n++) {
+				Edge ne = graph.get(rem.v).get(n);
+				if (!visited[ne.nbr]) {
+					pq.add(new Ppair(ne.nbr, rem.v, ne.wt));
+				}
+			}
+		}
+	}
+
+// this is also prims if you are asked to construct the min spanning tree 
+	static class MstHelper implements Comparable<MstHelper> {
+		int v;
+		int parent;
+		int cost;
+
+		public MstHelper(int v, int parent, int cost) {
+			this.v = v;
+			this.parent = parent;
+			this.cost = cost;
+		}
+
+		@Override
+		public int compareTo(MstHelper arg0) {
+			return this.cost - arg0.cost;
+		}
+
+		public String toString() {
+			return v + " via " + parent + " @" + cost;
+		}
+	}
+
+	public static ArrayList<ArrayList<Edge>> Mst(ArrayList<ArrayList<Edge>> graph, int src, boolean[] visited) {
+
+		ArrayList<ArrayList<Edge>> mygraph = new ArrayList<>();
+
+		for (int i = 0; i < graph.size(); i++) {
+			mygraph.add(new ArrayList<>());
+		}
+
+		PriorityQueue<MstHelper> queue = new PriorityQueue<>();
+
+		queue.add(new MstHelper(src, -1, 0));
+		while (queue.size() > 0) {
+			MstHelper rem = queue.peek();
+			queue.remove();
+
+			if (visited[rem.v] == true) {
+				continue;
+			} else {
+				visited[rem.v] = true;
+			}
+
+			if (rem.parent != -1) {
+				addEdge(mygraph, rem.v, rem.parent, rem.cost);
+			}
+
+			for (int n = 0; n < graph.get(rem.v).size(); n++) {
+				Edge ne = graph.get(rem.v).get(n);
+
+				if (visited[ne.nbr] == false) {
+					queue.add(new MstHelper(ne.nbr, rem.v, ne.wt));
+				}
+			}
+		}
+
+		return mygraph;
+	}
+
+	static void TopologicalSorMatser(ArrayList<ArrayList<Edge>> graph) {
+
+		boolean[] visited = new boolean[graph.size()];
+		LinkedList<Integer> stack = new LinkedList<>();
+		for (int i = 0; i < graph.size(); i++) {
+			if (visited[i] == false) {
+				TopologicalSorHelper(graph, visited, stack, i);
+
+			}
+		}
+
+		while (stack.size() > 0) {
+			System.out.print(stack.pop() + " ");
+		}
+
+	}
+
+	
+	private static void TopologicalSorHelper(ArrayList<ArrayList<Edge>> graph, boolean[] visited,
+			LinkedList<Integer> stack, int src) {
+
+		visited[src] = true;
+
+		for (int i = 0; i < graph.get(src).size(); i++) {
+			Edge ne = graph.get(src).get(i);
+
+			if (visited[ne.nbr] == false) {
+				TopologicalSorHelper(graph, visited, stack, ne.nbr);
+			}
+		}
+		stack.push(src);
+	}
+
+
+	static void addEdgeSingle(ArrayList<ArrayList<Edge>> graph, int v1, int v2, int w) {
+
+		graph.get(v1).add(new Edge(v2, w));
+
+	}
+	
+
+	static class Kedge implements Comparable<Kedge> {
+		int v1;
+		int v2;
+		int w;
+
+		public Kedge(int v1, int v2, int w) {
+			this.v1 = v1;
+			this.v2 = v2;
+			this.w = w;
+
+		}
+
+		@Override
+		public int compareTo(Kedge arg0) {
+			return this.w - arg0.w;
+		}
+
+	}
+
+	public static ArrayList<ArrayList<Edge>> krushkals(ArrayList<ArrayList<Edge>> graph) {
+
+		ArrayList<ArrayList<Edge>> mst = new ArrayList<>();
+		int[] pa = new int[graph.size()];
+		int[] ra = new int[graph.size()];
+
+		for (int i = 0; i < graph.size(); i++) {
+			mst.add(new ArrayList<>());
+			ra[i] = 1;
+			pa[i] = i;
+		}
+
+		PriorityQueue<Kedge> queue = new PriorityQueue<>();
+
+		for (int v = 0; v < graph.size(); v++) {
+			for (int n = 0; n < graph.get(v).size(); n++) {
+
+				Edge ne = graph.get(v).get(n);
+				if (v < ne.nbr) {
+					queue.add(new Kedge(v, ne.nbr, ne.wt));
+				}
+
+			}
+		}
+		int counter = 0;
+		while (queue.size() > 0 && counter < graph.size() - 1) {
+
+			Kedge rem = queue.remove();
+
+			int v1sl = find(pa, rem.v1);// v1 set leader
+			int v2sl = find(pa, rem.v2);
+
+			if (v1sl != v2sl) {
+				addEdge(mst, rem.v1, rem.v2, rem.w);
+				counter++;
+				merge(pa, ra, v1sl, v2sl);
+			}
+
+		}
+
+		return mst;
+	}
+
+	private static void merge(int[] pa, int[] ra, int v1sl, int v2sl) {
+
+		if (ra[v1sl] < ra[v2sl]) {
+			pa[v1sl] = v2sl;
+		} else if (ra[v2sl] < ra[v1sl]) {
+			pa[v2sl] = v1sl;
+		} else {
+			pa[v1sl] = v2sl;
+			ra[v2sl]++;
+		}
+	}
+
+	private static Integer find(int[] pa, int v1) {
+		if (pa[v1] == v1) {
+			return v1;
+		} else {
+			int sl = find(pa, pa[v1]);
+			pa[v1]=sl;
+			return sl;
+		}
+	}
+//	for (int v = 0; v < 7; v++) {
+//		topo.add(new ArrayList<>());
+//	}
+//	addEdgeSingle(topo, 0, 1, 1);
+//	addEdgeSingle(topo, 1, 2, 1);
+//	addEdgeSingle(topo, 2, 3, 1);
+//	addEdgeSingle(topo, 0, 4, 1);
+//	addEdgeSingle(topo, 5, 4, 1);
+//	addEdgeSingle(topo, 5, 6, 1);
+//	addEdgeSingle(topo, 6, 3, 1);
+//	TopologicalSorMatser(topo);
+
+
+	public static ArrayList<ArrayList<Edge>> floyd = new ArrayList<>();
+
+	public static ArrayList<ArrayList<Edge>> topo = new ArrayList<>();
+
+	public static ArrayList<ArrayList<Edge>> bell = new ArrayList<>();
+
 	public static void main(String[] args) {
 
 		for (int v = 0; v < 7; v++) {
@@ -552,12 +841,37 @@ public class Graphs {
 		addEdge(graph, 0, 3, 40);
 		addEdge(graph, 3, 4, 2);
 		addEdge(graph, 4, 5, 3);
-//		addEdge(graph, 5, 6, 3);
+		addEdge(graph, 5, 6, 3);
 		addEdge(graph, 4, 6, 8);
-		System.out.println(isBipartite(graph));
+		display(krushkals(graph));
+
 //		boolean[] visited = new boolean[graph.size()];
 
-	
+		for (int v = 0; v < 4; v++) {
+			floyd.add(new ArrayList<>());
+		}
+
+		
+		for (int v = 0; v < 4; v++) {
+			bell.add(new ArrayList<>());
+		}
+
+//		addEdgeSingle(bell, 0, 1, 2);
+//		addEdgeSingle(bell, 1, 2, 4);
+//		addEdgeSingle(bell, 2, 3, 8);
+//		addEdgeSingle(bell, 3, 0, 9);
+//		addEdgeSingle(bell, 2, 0, -5);
+//
+//		bellmanFord(bell, 0);
+
+		
+//		floyd.get(0).add(new Edge(1, 2));
+//		floyd.get(0).add(new Edge(2, 4));
+//		floyd.get(0).add(new Edge(3, 8));
+//		floyd.get(1).add(new Edge(2, 1));
+//		floyd.get(1).add(new Edge(3, 5));
+//		floyd.get(2).add(new Edge(3, 1));
+
 	}
 
 }
