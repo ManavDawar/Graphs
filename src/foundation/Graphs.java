@@ -1,8 +1,11 @@
 package foundation;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 public class Graphs {
 
@@ -19,9 +22,11 @@ public class Graphs {
 
 	public static ArrayList<ArrayList<Edge>> graph = new ArrayList<>();
 
-	public static void addEdge(ArrayList<ArrayList<Edge>> graph, int v1, int v2, int wt) {
-		graph.get(v1).add(new Edge(v2, wt));
-		graph.get(v2).add(new Edge(v1, wt));
+	static void addEdge(ArrayList<ArrayList<Edge>> graph, int v1, int v2, int w) {
+
+		graph.get(v1).add(new Edge(v2, w));
+		graph.get(v2).add(new Edge(v1, w));
+
 	}
 
 	public static void display(ArrayList<ArrayList<Edge>> graph) {
@@ -270,21 +275,22 @@ public class Graphs {
 //	addEdge(graph, 2, 5, 5);
 //	hamiltonianpath(graph, 0);
 
-	static int counter=0;
+	static int counter = 0;
+
 	public static void KnightsTour(int[][] chess, int r, int c, int move) {
 
-		if(move==chess.length*chess[0].length-1) {
-			chess[r][c]=move;
+		if (move == chess.length * chess[0].length - 1) {
+			chess[r][c] = move;
 			++counter;
-			System.out.println("------------"+counter+"------------");
-			for(int i=0;i<chess.length;i++) {
-				for(int j=0;j<chess[0].length;j++) {
-					System.out.print(chess[i][j]+" ");
+			System.out.println("------------" + counter + "------------");
+			for (int i = 0; i < chess.length; i++) {
+				for (int j = 0; j < chess[0].length; j++) {
+					System.out.print(chess[i][j] + " ");
 				}
 				System.out.println();
 			}
-			
-			chess[r][c]=-1;
+
+			chess[r][c] = -1;
 			return;
 		}
 		chess[r][c] = move;
@@ -298,19 +304,19 @@ public class Graphs {
 			KnightsTour(chess, r + 1, c + 2, move + 1);
 		}
 		if (isKnightValid(chess, r + 2, c + 1)) {
-			KnightsTour(chess, r + 2, c + 1, move+1);
+			KnightsTour(chess, r + 2, c + 1, move + 1);
 		}
 		if (isKnightValid(chess, r + 2, c - 1)) {
-			KnightsTour(chess, r + 2, c - 1, move+1);
+			KnightsTour(chess, r + 2, c - 1, move + 1);
 		}
 		if (isKnightValid(chess, r + 1, c - 2)) {
-			KnightsTour(chess, r + 1, c - 2, move+1);
+			KnightsTour(chess, r + 1, c - 2, move + 1);
 		}
 		if (isKnightValid(chess, r - 1, c - 2)) {
-			KnightsTour(chess, r - 1, c - 2, move+1);
+			KnightsTour(chess, r - 1, c - 2, move + 1);
 		}
 		if (isKnightValid(chess, r - 2, c - 1)) {
-			KnightsTour(chess, r - 2, c - 1, move+1);
+			KnightsTour(chess, r - 2, c - 1, move + 1);
 		}
 
 		chess[r][c] = -1;
@@ -324,6 +330,216 @@ public class Graphs {
 		return true;
 	}
 
+//	int[][] arr = new int[5][5];
+//	for (int i = 0; i < arr.length; i++) {
+//		Arrays.fill(arr[i], -1);
+//	}
+//
+//	KnightsTour(arr, 1, 1, 0);
+	public static void astro(int[] arr1, int[] arr2, int n) {
+
+		ArrayList<ArrayList<Edge>> graph1 = new ArrayList<>();
+		ArrayList<Integer> list = new ArrayList<>();
+		for (int i = 0; i < n; i++) {
+			graph1.add(new ArrayList<>());
+		}
+
+		for (int i = 0; i < arr1.length; i++) {
+			addEdge(graph1, arr1[i], arr2[i], 1);
+		}
+		list = gccint(graph1);
+		int ans = 0;
+		System.out.println(list);
+
+		for (int i = 0; i < list.size(); i++) {
+			for (int j = i + 1; j < list.size(); j++) {
+				ans += list.get(i) * list.get(j);
+			}
+		}
+		System.out.println(ans);
+
+	}
+//	int[] arr1 = { 2, 3, 8, 1, 6, 4 };
+//	int[] arr2 = { 9, 8, 7, 7, 5, 2 };
+//
+//	astro(arr1, arr2, 10);
+
+	static ArrayList<Integer> gccint(ArrayList<ArrayList<Edge>> graph) {
+
+		ArrayList<Integer> list = new ArrayList<>();
+
+		boolean[] visited = new boolean[graph.size()];
+
+		for (int v = 0; v < graph.size(); v++) {
+			if (visited[v] == false) {
+				Integer comp = getconnectedcomponentint(graph, visited, v);
+				list.add(comp);
+			}
+		}
+		return list;
+	}
+
+	private static Integer getconnectedcomponentint(ArrayList<ArrayList<Edge>> graph, boolean[] visited, int v) {
+		Integer comp = 0;
+		LinkedList<Integer> queue = new LinkedList<>();
+		queue.add(v);
+		while (queue.size() > 0) {
+			int rem = queue.removeFirst();
+			if (visited[rem] == true) {
+				continue;
+			} else {
+				visited[rem] = true;
+			}
+			comp++;
+			for (int n = 0; n < graph.get(rem).size(); n++) {
+				Edge ne = graph.get(rem).get(n);
+				if (visited[ne.nbr] == false) {
+					queue.add(ne.nbr);
+				}
+			}
+		}
+		return comp;
+	}
+
+	static ArrayList<String> gcc() {
+		ArrayList<String> comps = new ArrayList<>();
+		boolean[] visited = new boolean[graph.size()];
+
+		for (int i = 0; i < graph.size(); i++) {
+			if (visited[i] == false) {
+				String comp = gccomponents(visited, i);
+				comps.add(comp);
+			}
+		}
+		return comps;
+	}
+
+	private static String gccomponents(boolean[] visited, int i) {
+		String comp = "";
+		Queue<Integer> q = new LinkedList<>();
+		q.add(i);
+		while (q.size() > 0) {
+			Integer rem = q.remove();
+			if (visited[rem] == true) {
+				continue;
+			}
+			visited[rem] = true;
+			comp += rem;
+
+			for (int n = 0; n < graph.get(rem).size(); n++) {
+				Integer ne = graph.get(rem).get(n).nbr;
+				if (visited[ne] == false) {
+					q.add(ne);
+				}
+			}
+		}
+		return comp;
+	}
+
+	static boolean isConnected() {
+		int counter = 0;
+		boolean[] visited = new boolean[graph.size()];
+		for (int v = 0; v < graph.size(); v++) {
+			if (visited[v] == false) {
+				getconnectedcomponentint(graph, visited, v);
+				counter++;
+
+				if (counter == 2) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	static boolean isCyclic() {
+		boolean iscycle = false;
+		boolean[] visited = new boolean[graph.size()];
+		for (int v = 0; v < graph.size(); v++) {
+			if (visited[v] == false) {
+				iscycle = isCompCyclic(v, visited);
+				if (iscycle) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	private static boolean isCompCyclic(int v, boolean[] visited) {
+		Queue<Integer> q = new LinkedList<>();
+		q.add(v);
+		while (q.size() > 0) {
+			Integer rem = q.remove();
+
+			if (visited[rem] == true) {
+				return true;
+			}
+			visited[rem] = true;
+
+			for (int n = 0; n < graph.get(rem).size(); n++) {
+				Integer ne = graph.get(rem).get(n).nbr;
+				if (visited[ne] == false) {
+					q.add(ne);
+				}
+			}
+
+		}
+		return false;
+	}
+
+	static class Bipair {
+		int v;
+		int l;
+
+		public Bipair(int l, int v) {
+			this.l = l;
+			this.v = v;
+		}
+	}
+
+	static boolean isBipartite(ArrayList<ArrayList<Edge>> graph) {
+		int[] visited = new int[graph.size()];
+		for (int v = 0; v < graph.size(); v++) {
+			if (visited[v] == 0) {
+				boolean isBipar = isBiHelper(graph, v, visited);
+				if (!isBipar) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
+	private static boolean isBiHelper(ArrayList<ArrayList<Edge>> graph2, int v, int[] visited) {
+		Queue<Bipair> q = new LinkedList<>();
+		q.add(new Bipair(0, v));
+
+		while (q.size() > 0) {
+			Bipair rem = q.remove();
+
+			if (visited[rem.v] != 0) {
+				if (visited[rem.v] % 2 != rem.l % 2) {
+					return false;
+				}
+			}
+			visited[rem.v] = rem.l;
+			for (int n = 0; n < graph.get(rem.v).size(); n++) {
+				Edge ne = graph.get(rem.v).get(n);
+				if (visited[ne.nbr] == 0) {
+					q.add(new Bipair(rem.l + 1, ne.nbr));
+				}
+			}
+		}
+		return true;
+	}
+//	addEdge(graph, 0, 1, 10);
+//	addEdge(graph, 1, 2, 10);
+//	addEdge(graph, 2, 0, 10);
+//	System.out.println(isBipartite(graph));
+
 	public static void main(String[] args) {
 
 		for (int v = 0; v < 7; v++) {
@@ -336,15 +552,12 @@ public class Graphs {
 		addEdge(graph, 0, 3, 40);
 		addEdge(graph, 3, 4, 2);
 		addEdge(graph, 4, 5, 3);
-		addEdge(graph, 5, 6, 3);
+//		addEdge(graph, 5, 6, 3);
 		addEdge(graph, 4, 6, 8);
-		boolean[] visited = new boolean[graph.size()];
-		int[][] arr = new int[5][5];
-		for (int i = 0; i < arr.length; i++) {
-			Arrays.fill(arr[i], -1);
-		}
+		System.out.println(isBipartite(graph));
+//		boolean[] visited = new boolean[graph.size()];
 
-		KnightsTour(arr, 1, 1, 0);
+	
 	}
 
 }
