@@ -9,4 +9,7 @@ Day 6 - 3 November 2019
 3. 694 No of Distinct Island 
 4. 737 Sentence Similarity 2
 5. 851 Loud and Rich 
-6. 
+6. 684 Redundant Connection
+7. 778 Swim in Rising water 
+8. 854 K Similar Strings
+9. 128 Longest Consequtive Sequence
