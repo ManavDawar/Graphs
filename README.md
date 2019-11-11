@@ -27,3 +27,5 @@ Day 7 - 9 November 2019
 9. Geeks for geeks practice Coins and game
 
 Day 8- 10 November 2019
+1. Ford Fulkerson 
+2. Edmund Kart
